@@ -1,5 +1,5 @@
 #! usr/bin/env python3
-from postgres_cursor import get_cursor, execute_query, commit_connection, close_cursor, execute_cursor
+from postgreslib.postgres_cursor import get_cursor, execute_query, commit_connection, close_cursor, execute_cursor
 import json
 
 def main():
@@ -36,6 +36,11 @@ LIMIT 1;
 """
     result = execute_query(base_query.format(column,table))[0][0]
 #    print(result)
+    return result
+
+def watch_table(table):
+    query = "select watch_table('{}','changes');"
+    result = execute_query(query.format(table))
     return result
 
 def get_column_from_table(table,column) :

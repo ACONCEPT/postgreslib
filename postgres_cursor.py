@@ -1,7 +1,8 @@
 #! usr/bin/env python3
 import psycopg2
 import json
-from create_tables import get_conn_string
+from postgreslib.create_tables import get_conn_string
+
 """
 functions in module :
 	get_cursor
@@ -11,18 +12,21 @@ functions in module :
     execute_cursor
 """
 
-def get_cursor():
+def get_cursor(return_cursor = False,return_connection = False):
     global CURSOR
     global CONNECTION
-#    conn_string = "host='localhost' dbname='test' user='test' password='test'"
     conn_string = get_conn_string()
     CONNECTION = psycopg2.connect(conn_string)
     CURSOR = CONNECTION.cursor()
-#    print(CURSOR)
+    result = []
+    if return_cursor:
+        result.append(CURSOR)
+    if return_connection:
+        result.append(CONNECTION)
+    return result
 
 def execute_cursor(stmt):
     global CURSOR
-#    print("\n{}\n".format("executing {}".format(stmt)))
     CURSOR.execute(stmt)
 
 def execute_query(query):
@@ -40,5 +44,3 @@ def commit_connection():
 
 if __name__ == '__main__':
     pass
-#    get_cursor()
-#    print(execute_query("select * from parts;"))

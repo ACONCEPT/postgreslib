@@ -1,12 +1,15 @@
 import psycopg2
 import sys
+import os
 
 def get_conn_string():
-    with open("../postgres_connection_string","r") as f:
-        return f.read().strip()
+    conn = os.environ.get("PYTHON_POSTGRES_CONN")
+    if not conn:
+        raise ValueError("must set POSTGRES_PYTHON_CONN in environment")
+    return conn
 
 
-def create_tables(conn_string):
+def create_tables():
     """ create tables in the PostgreSQL database"""
     commands = (
         """
@@ -138,6 +141,7 @@ def create_tables(conn_string):
     conn = None
     try:
         # connect to the PostgreSQL server
+        conn_string = get_conn_string()
         conn = psycopg2.connect(conn_string)
         cur = conn.cursor()
         # create table one by one

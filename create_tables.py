@@ -3,10 +3,11 @@ import sys
 import os
 
 def get_conn_string():
-    conn = os.environ.get("PYTHON_POSTGRES_CONN",False)
-    if not conn:
-        raise ValueError("must set PYTHON_POSTGRES_CONN in environment")
-    return conn
+ conn = os.environ.get("PYTHON_POSTGRES_CONN",False)
+ if not conn:
+     raise ValueError("must set PYTHON_POSTGRES_CONN in environment")
+ return conn
+
 
 
 def create_tables():
@@ -145,20 +146,24 @@ def create_tables():
         conn = psycopg2.connect(conn_string)
         cur = conn.cursor()
         # create table one by one
+        print("got connection")
         for command in commands:
             cur.execute(command)
+            print("executed command")
         # close communication with the PostgreSQL database server
         cur.close()
+        print("closed teh cursor")
         # commit the changes
         conn.commit()
+        print("committed the connection")
     except (Exception) as error:
         print(error)
         raise error
     finally:
         if conn is not None:
             conn.close()
+            print("closed the connection")
 
 if __name__ == '__main__':
-    conn_string = get_conn_string()
-    create_tables(conn_string)
+    create_tables()
 

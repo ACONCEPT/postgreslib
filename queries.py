@@ -1,5 +1,10 @@
 #! usr/bin/env python3
-from postgreslib.postgres_cursor import get_cursor, execute_query, commit_connection, close_cursor, execute_cursor
+from postgreslib.postgres_cursor import get_cursor,\
+        execute_query,\
+        commit_connection,\
+        close_cursor,\
+        execute_cursor
+
 import json
 
 def main():
@@ -13,7 +18,6 @@ def get_base_table_descriptions():
         query_result,description = execute_query(base_query.format(table))
         description = {desc.name: get_type_name(desc.type_code) for desc in description}
         result.update({table:description})
-
     with open("base_table_definitions.json","w+") as f:
         f.write(json.dumps(result))
     return result
@@ -61,11 +65,4 @@ def get_base_tables():
 
 if __name__ == '__main__':
     get_cursor()
-#    customer_list = get_column_from_table("customers","id")
-#    print(customer_list)
     close_cursor()
-
-#    with open("base_table_definitions.json","r") as f:
-#        definitions = json.loads(f.read())
-#    for key,item in definitions.items():
-#        print(key,item)

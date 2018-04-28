@@ -3,9 +3,9 @@ import sys
 import os
 
 def get_conn_string():
-    conn = os.environ.get("PYTHON_POSTGRES_CONN")
+    conn = os.environ.get("PYTHON_POSTGRES_CONN",False)
     if not conn:
-        raise ValueError("must set POSTGRES_PYTHON_CONN in environment")
+        raise ValueError("must set PYTHON_POSTGRES_CONN in environment")
     return conn
 
 

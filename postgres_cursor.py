@@ -37,11 +37,6 @@ def get_cursor(return_cursor = False):
         get_connection()
         CURSOR = CONNECTION.cursor()
 
-    result = []
-    if return_cursor:
-        result.append(CURSOR)
-
-    return result
 
 def execute_cursor(stmt):
     global CURSOR

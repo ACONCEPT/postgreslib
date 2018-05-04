@@ -1,11 +1,11 @@
 #! usr/bin/env python3
+sys.path.append(os.environ["PROJECT_HOME"])
 import psycopg2
 import json
 try:
     from postgreslib.create_tables import get_conn_string
 except ImportError:
     from create_tables import get_conn_string
-
 """
 functions in module :
 	get_cursor
@@ -14,7 +14,6 @@ functions in module :
 	execute_query
     execute_cursor
 """
-
 def contained_execute(func,*args,**kwargs):
     get_connection()
     get_cursor()

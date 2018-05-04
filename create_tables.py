@@ -1,14 +1,10 @@
 import psycopg2
 import sys
 import os
-
-def get_conn_string():
- conn = os.environ.get("PYTHON_POSTGRES_CONN",False)
- if not conn:
-     raise ValueError("must set PYTHON_POSTGRES_CONN in environment")
- return conn
-
-
+try:
+    from postgreslib.postgres_cursor import get_conn_string
+else:
+    from postgres_cursor import get_conn_string
 
 def create_tables():
     """ create tables in the PostgreSQL database"""

@@ -22,6 +22,7 @@ class DBConnection(object):
         self.connection_type = datasource.get("type",None)
         self.queries = base_queries
         self.open_connection()
+        self.get_base_table_descriptions()
 
     def open_connection(self):
         if self.connection_type == "postgres":
@@ -79,7 +80,7 @@ class DBConnection(object):
 
     def get_base_tables(self):
         query = self.queries.get("select_tables")
-        tables_list,description = self.execute_query()
+        tables_list,description = self.execute_query(query)
         non_pg_tables = [table for table in tables_list if\
                          "pg" not in table[2] \
                          and table[1] != "information_schema"]
@@ -104,17 +105,17 @@ class DBConnection(object):
         base_tables = self.get_base_tables()
         return [table[2] for table in base_tables]
 
-    def get_type_name(oid):
+    def get_type_name(self,oid):
         base_query = self.queries.get("select_type")
         names, description = self.execute_query(base_query.format(oid))
         return names[0][0]
 
     def get_base_table_descriptions(self):
-        base_table_names = get_base_table_names()
+        base_table_names = self.get_base_table_names()
         result = {}
         for table in base_table_names:
             description = self.get_table_description(table)
-            description = {desc.name: get_type_name(desc.type_code) for desc in description}
+            description = {desc.name: self.get_type_name(desc.type_code) for desc in description}
             result.update({table:description})
         self.descriptions = result
         return result

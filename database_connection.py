@@ -1,5 +1,6 @@
 #! usr/bin/env python3
 import psycopg2
+from psycopg2 import IntegrityError
 import json
 import sys
 import os
@@ -10,7 +11,9 @@ base_queries = {"select_all": "select {} from {};",
                 "select_random":" SELECT {} FROM {} ORDER BY random() LIMIT 1; ",
                 "select_type":"select typname from pg_type where oid = {};",
                 "select_null":"select * from {} where 1 = 2;",
-                "select_tables":"select * from information_schema.tables;"}
+                "select_tables":"select * from information_schema.tables;",
+                "so_lead_time": "select delivery_lead_time from part_customers where part_id = {} and  customer_id = {};" ,
+                "po_lead_time": "select supply_lead_time from part_suppliers where part_id = {};" }
 
 class DBConnection(object):
     def __init__(self,source_name):
@@ -32,11 +35,14 @@ class DBConnection(object):
     def commit_connection(self):
         self.conn.commit()
 
+    def rollback_connection(self):
+        self.conn.rollback()
+
     def get_cursor(self, name = None):
         return self.conn.cursor(name)
 
-    def execute_cursor(self,stmt,commit = False):
-        cursor = self.get_cursor("execute_stmt")
+    def execute_cursor(self,stmt,commit = False, ignore_errors = False):
+        cursor = self.get_cursor()
         cursor.execute(stmt)
         if commit:
             self.commit_connection()
@@ -89,12 +95,12 @@ class DBConnection(object):
         result = execute_query(query.format(table))
         return result
 
-    def get_random_value_from_column(table,column):
+    def get_random_value_from_column(self,table,column):
         base_query = self.queries.get("select_random")
         result = self.execute_query(base_query.format(column,table))[0][0]
         return result
 
-    def get_base_table_names():
+    def get_base_table_names(self):
         base_tables = self.get_base_tables()
         return [table[2] for table in base_tables]
 
@@ -103,7 +109,7 @@ class DBConnection(object):
         names, description = self.execute_query(base_query.format(oid))
         return names[0][0]
 
-    def get_base_table_descriptions():
+    def get_base_table_descriptions(self):
         base_table_names = get_base_table_names()
         result = {}
         for table in base_table_names:
@@ -118,9 +124,20 @@ class DBConnection(object):
         query_result,description = self.execute_query(base_query.format(table))
         return description
 
+    def get_customer_lead_time(self,part,customer):
+        base_query = self.queries.get("so_lead_time")
+        query_result, description = self.execute_query(base_query.format(part,customer))
+        return query_result[0][0]
+
+    def get_supply_lead_time(self,part):
+        base_query = self.queries.get("po_lead_time")
+        query_result, description = self.execute_query(base_query.format(part))
+        return query_result[0][0]
+
+
+
 if __name__ == '__main__':
-    db = source_databases.get("test_database")
-    test = DBConnection(db)
+    test = DBConnection("test_database")
     test.open_connection()
     generator,desc = test.stream_table("sales_orders")
     import time

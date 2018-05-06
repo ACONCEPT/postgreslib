@@ -1,12 +1,9 @@
 import psycopg2
 import sys
 import os
-try:
-    from postgreslib.postgres_cursor import get_conn_string
-else:
-    from postgres_cursor import get_conn_string
 
-def create_tables():
+
+def create_tables(dbc):
     """ create tables in the PostgreSQL database"""
     commands = (
         """
@@ -137,27 +134,23 @@ def create_tables():
         """)
     conn = None
     try:
-        # connect to the PostgreSQL server
-        conn_string = get_conn_string()
-        conn = psycopg2.connect(conn_string)
-        cur = conn.cursor()
         # create table one by one
         print("got connection")
         for command in commands:
-            cur.execute(command)
+            dbc.execute_cursor(command)
             print("executed command")
         # close communication with the PostgreSQL database server
-        cur.close()
-        print("closed teh cursor")
+        print("closed the cursor")
         # commit the changes
-        conn.commit()
+        dbc.commit_connection()
         print("committed the connection")
+
     except (Exception) as error:
         print(error)
         raise error
     finally:
         if conn is not None:
-            conn.close()
+            dbc.close_connection()
             print("closed the connection")
 
 if __name__ == '__main__':

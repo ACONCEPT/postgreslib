@@ -4,19 +4,12 @@ from psycopg2 import IntegrityError
 import json
 import sys
 import os
-sys.path.append(os.environ["PROJECT_HOME"])
-from config.database_connections import source_databases
-
-base_queries = {"select_all": "select {} from {};",
-                "select_random":" SELECT {} FROM {} ORDER BY random() LIMIT 1; ",
-                "select_type":"select typname from pg_type where oid = {};",
-                "select_null":"select * from {} where 1 = 2;",
-                "select_tables":"select * from information_schema.tables;",
-                "so_lead_time": "select delivery_lead_time from part_customers where part_id = {} and  customer_id = {};" ,
-                "po_lead_time": "select supply_lead_time from part_suppliers where part_id = {};" }
+from config.database_connections import source_databases, base_queries
 
 class DBConnection(object):
     def __init__(self,source_name):
+        print("dbconnection got source name {}".format(source_name))
+        print("source database keys {} ".format(source_databases))
         datasource = source_databases.get(source_name)
         self.connection_string =  datasource.get("connection_details",None)
         self.connection_type = datasource.get("type",None)

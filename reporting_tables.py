@@ -13,7 +13,8 @@ def create_tables(dbc):
         """
         CREATE TABLE IF NOT EXISTS tracked_topics(
             topic_name VARCHAR(100) NOT NULL,
-            quantity INTEGER NOT NULL)
+            quantity INTEGER NOT NULL,
+            timestamp TIMESTAMP DEFAULT NOW())
         """,
 
         """

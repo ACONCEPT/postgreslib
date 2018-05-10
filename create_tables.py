@@ -34,7 +34,7 @@ def create_tables(dbc):
         """
         CREATE TABLE IF NOT EXISTS sales_orders (
                 id SERIAL PRIMARY KEY,
-                part_id VARCHAR(100) NOT NULL,
+                part_id INTEGER NOT NULL,
                 customer_id INTEGER NOT NULL,
                 site_id INTEGER NOT NULL,
                 quantity INTEGER NOT NULL,

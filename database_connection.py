@@ -2,6 +2,7 @@
 
 import psycopg2
 from psycopg2 import IntegrityError
+from psycopg2 import ProgrammingError
 import json
 import sys
 import os
@@ -9,8 +10,8 @@ from config.database_connections import source_databases, base_queries
 
 class DBConnection(object):
     def __init__(self,source_name):
-        print("dbconnection got source name {}".format(source_name))
-        print("source database keys {} ".format(source_databases))
+#        print("dbconnection got source name {}".format(source_name))
+#        print("source database keys {} ".format(source_databases))
         datasource = source_databases.get(source_name)
         self.connection_string =  datasource.get("connection_details",None)
         self.connection_type = datasource.get("type",None)
@@ -45,9 +46,15 @@ class DBConnection(object):
 
     def execute_query(self,query):
         cursor = self.get_cursor("execute_query")
-        cursor.execute(query)
-        data = cursor.fetchall()
-        description = cursor.description
+        try:
+            cursor.execute(query)
+            data = cursor.fetchall()
+            description = cursor.description
+        except ProgrammingError as e:
+            cursor.close()
+            self.close_connection()
+            self.open_connection()
+            raise e
         cursor.close()
         return data, description
 
